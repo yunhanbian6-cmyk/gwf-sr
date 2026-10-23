@@ -1,0 +1,9 @@
+# Core runtime dependencies for the GWF image super-resolution experiment.
+torch>=2.0
+numpy>=1.24
+Pillow>=9.5
+matplotlib>=3.7
+PyYAML>=6.0
+
+# Development and verification.
+pytest>=7.4

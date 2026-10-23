@@ -1,0 +1,8 @@
+# Minimal dependencies for stage-two data generation.
+torch>=2.0
+numpy>=1.24
+Pillow>=9.5
+PyYAML>=6.0
+
+# Development and verification.
+pytest>=7.4

@@ -1,0 +1,72 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+
+# Test / coverage
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+
+# IDE / editor
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Project-specific generated data and results
+# Keep manifest and .gitkeep, ignore generated images/checkpoints.
+results/**/*_hr.png
+results/**/*_lr.png
+results/**/*_bicubic.png
+results/**/checkpoints/
+results/**/logs/
+data/**
+!data/.gitkeep
+results/**
+!results/.gitkeep
+!results/smoke/
+!results/smoke/data/
+!results/smoke/data/manifest.json
+
+# Temporary extraction artifacts (not part of the project)
+gwf_pdf_extracted.txt
+extract_gwf_pdf_for_explanation.py
+create_gwf_plain_language_explanation.py
+GWF_Detailed_Research_Report_CN.pdf
+GWF报告逐段通俗解释.docx

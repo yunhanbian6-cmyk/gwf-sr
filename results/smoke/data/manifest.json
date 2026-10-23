@@ -1,0 +1,104 @@
+{
+  "config_name": "smoke",
+  "config": {
+    "scale": 2,
+    "seed": 42,
+    "image_size": 32,
+    "sigma": 1.0,
+    "noise_std": 0.0,
+    "iterations": 20,
+    "dt": 0.05,
+    "lambda_values": [
+      0.0,
+      1.0
+    ],
+    "edge_weight_mode": "uniform",
+    "epsilon": 1e-08,
+    "output_dir": "results",
+    "device": "cpu",
+    "config_name": "smoke"
+  },
+  "degradation": {
+    "scale": 2,
+    "sigma": 1.0,
+    "kernel_radius": 3
+  },
+  "images": [
+    {
+      "name": "piecewise_32_seed42",
+      "kind": "piecewise",
+      "seed": 42,
+      "hr_path": "results\\smoke\\data\\piecewise_32_seed42_hr.png",
+      "lr_path": "results\\smoke\\data\\piecewise_32_seed42_lr.png",
+      "bicubic_path": "results\\smoke\\data\\piecewise_32_seed42_bicubic.png",
+      "hr_size": [
+        32,
+        32
+      ],
+      "lr_size": [
+        16,
+        16
+      ],
+      "scale": 2,
+      "sigma": 1.0,
+      "noise_std": 0.0
+    },
+    {
+      "name": "edges_32_seed43",
+      "kind": "edges",
+      "seed": 43,
+      "hr_path": "results\\smoke\\data\\edges_32_seed43_hr.png",
+      "lr_path": "results\\smoke\\data\\edges_32_seed43_lr.png",
+      "bicubic_path": "results\\smoke\\data\\edges_32_seed43_bicubic.png",
+      "hr_size": [
+        32,
+        32
+      ],
+      "lr_size": [
+        16,
+        16
+      ],
+      "scale": 2,
+      "sigma": 1.0,
+      "noise_std": 0.0
+    },
+    {
+      "name": "texture_32_seed44",
+      "kind": "texture",
+      "seed": 44,
+      "hr_path": "results\\smoke\\data\\texture_32_seed44_hr.png",
+      "lr_path": "results\\smoke\\data\\texture_32_seed44_lr.png",
+      "bicubic_path": "results\\smoke\\data\\texture_32_seed44_bicubic.png",
+      "hr_size": [
+        32,
+        32
+      ],
+      "lr_size": [
+        16,
+        16
+      ],
+      "scale": 2,
+      "sigma": 1.0,
+      "noise_std": 0.0
+    },
+    {
+      "name": "smooth_32_seed45",
+      "kind": "smooth",
+      "seed": 45,
+      "hr_path": "results\\smoke\\data\\smooth_32_seed45_hr.png",
+      "lr_path": "results\\smoke\\data\\smooth_32_seed45_lr.png",
+      "bicubic_path": "results\\smoke\\data\\smooth_32_seed45_bicubic.png",
+      "hr_size": [
+        32,
+        32
+      ],
+      "lr_size": [
+        16,
+        16
+      ],
+      "scale": 2,
+      "sigma": 1.0,
+      "noise_std": 0.0
+    }
+  ]
+}

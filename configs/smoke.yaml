@@ -1,0 +1,15 @@
+# Fast configuration used for smoke tests and early integration checks.
+scale: 2
+seed: 42
+image_size: 32
+sigma: 1.0
+noise_std: 0.0
+iterations: 20
+dt: 0.05
+lambda_values:
+  - 0.0
+  - 1.0
+edge_weight_mode: uniform
+epsilon: 1.0e-8
+output_dir: results
+device: cpu
