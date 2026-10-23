@@ -1,3 +1,4 @@
+import pytest
 import torch
 
 from gwf_sr.synthetic import make_synthetic_dataset, make_synthetic_image
@@ -29,3 +30,19 @@ def test_unknown_synthetic_kind_is_rejected():
         assert "Unknown synthetic image kind" in str(error)
     else:
         raise AssertionError("Expected an unknown image kind to be rejected.")
+
+
+@pytest.mark.parametrize("size", [2, 3, 4, 5, 6, 7, 8])
+def test_piecewise_constant_supports_small_sizes(size):
+    image = make_synthetic_image("piecewise", size=size, seed=11)
+    assert image.shape == (size, size)
+    assert image.dtype == torch.float32
+    assert torch.all(image >= 0.0)
+    assert torch.all(image <= 1.0)
+
+
+def test_piecewise_constant_small_size_is_deterministic():
+    first = make_synthetic_image("piecewise", size=4, seed=101)
+    second = make_synthetic_image("piecewise", size=4, seed=101)
+    assert torch.equal(first, second)
+

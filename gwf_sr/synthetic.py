@@ -19,11 +19,13 @@ def piecewise_constant(size: int, seed: int = 42) -> torch.Tensor:
 
     _check_size(size)
     generator = torch.Generator().manual_seed(seed)
-    columns = torch.div(torch.arange(size, dtype=torch.int64), size // 4, rounding_mode="floor")
-    column_values = torch.rand(size // 4 + 1, generator=generator)
+    column_stride = max(1, size // 4)
+    columns = torch.div(torch.arange(size, dtype=torch.int64), column_stride, rounding_mode="floor")
+    column_values = torch.rand(columns.max().item() + 1, generator=generator)
     image = column_values[columns].clone()
 
-    row_blocks = torch.div(torch.arange(size, dtype=torch.int64), size // 3, rounding_mode="floor")
+    row_stride = max(1, size // 3)
+    row_blocks = torch.div(torch.arange(size, dtype=torch.int64), row_stride, rounding_mode="floor")
     row_scale = torch.linspace(0.72, 1.0, row_blocks.max().item() + 1)
     return (image[:, None] * row_scale[row_blocks][None, :]).clamp(0.0, 1.0)
 
