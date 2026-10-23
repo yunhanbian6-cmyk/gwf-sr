@@ -28,6 +28,16 @@ from .graph import (
     graph_total_weight,
     normalized_adjacency_action,
 )
+from .solver import (
+    SolverResult,
+    SuperResolutionSolver,
+    data_fidelity,
+    data_fidelity_gradient,
+    degradation_adjoint,
+    degradation_forward,
+    project_image,
+    regularization_gradient,
+)
 
 __all__ = [
     "GWFConfig",
@@ -57,5 +67,13 @@ __all__ = [
     "curvature_quotient",
     "curvature_acceleration",
     "entropy_decay_rate",
+    "project_image",
+    "data_fidelity",
+    "data_fidelity_gradient",
+    "regularization_gradient",
+    "SuperResolutionSolver",
+    "SolverResult",
+    "degradation_forward",
+    "degradation_adjoint",
 ]
 __version__ = "0.1.0"
