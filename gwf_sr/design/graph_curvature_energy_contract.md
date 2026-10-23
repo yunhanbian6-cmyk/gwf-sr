@@ -1,6 +1,6 @@
 # Graph Structure, Curvature, and Regularized Energy Contract
 
-**Status:** Draft for user confirmation; no stage-four core implementation is included.  
+**Status:** Draft for user confirmation; no stage-four core implementation is included. Commit creation is pending because the workspace ACL currently prevents Git commands in this session; the Lead will handle or coordinate the isolated `stage4-contract` commit.  
 **Scope boundary:** This document freezes the mathematical and API contract only. It does not modify the stage-two data pipeline, the accepted stage-three geometry module, or any existing tests. The planned implementation module is `gwf_sr/graph.py`; this document does not create or modify that file.
 
 ---

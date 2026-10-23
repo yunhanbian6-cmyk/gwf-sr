@@ -49,6 +49,16 @@ coverage.xml
 .DS_Store
 Thumbs.db
 
+# Workspace sandbox probes (not project files)
+.git_probe*.py
+.git_status_probe.py
+gwf_sr/design/.write_probe_tmp.txt
+
+# Independent verification artifacts
+verify_stage2/
+verify_stage3/
+verify_stage4/
+
 # Project-specific generated data and results
 # Keep manifest and .gitkeep, ignore generated images/checkpoints.
 results/**/*_hr.png

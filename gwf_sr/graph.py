@@ -123,7 +123,7 @@ def _uniform_edge_tables(
     horizontal_source = (rows[:, None] * width + cols[None, :-1]).reshape(-1)
     horizontal_target = horizontal_source + 1
 
-    vertical_source = (rows[None, :-1] * width + cols[:, None]).reshape(-1)
+    vertical_source = (rows[:, None] * width + cols[None, :]).reshape(-1)[: (height - 1) * width]
     vertical_target = vertical_source + width
 
     forward_source = torch.cat((horizontal_source, vertical_source))
