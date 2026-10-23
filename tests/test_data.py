@@ -1,4 +1,5 @@
 from pathlib import Path
+import json
 
 import torch
 
@@ -30,3 +31,29 @@ def test_generate_configured_dataset(tmp_path: Path):
     manifest = tmp_path / "results" / "smoke" / "data" / "manifest.json"
     assert manifest.is_file()
     assert (tmp_path / "results" / "smoke" / "data" / f"{records[0].name}_hr.png").is_file()
+
+
+def test_manifest_uses_data_relative_image_paths(tmp_path: Path):
+    config = load_config("configs/smoke.yaml")
+    records = generate_configured_dataset(config, kinds=("piecewise",), root=tmp_path)
+    data_dir = tmp_path / "results" / "smoke" / "data"
+    manifest = json.loads((data_dir / "manifest.json").read_text(encoding="utf-8"))
+    record = manifest["images"][0]
+
+    assert record["hr_path"] == f"{records[0].name}_hr.png"
+    assert record["lr_path"] == f"{records[0].name}_lr.png"
+    assert record["bicubic_path"] == f"{records[0].name}_bicubic.png"
+    for key in ("hr_path", "lr_path", "bicubic_path"):
+        assert not Path(record[key]).is_absolute()
+        assert (data_dir / record[key]).is_file()
+
+
+def test_manifest_is_reproducible_across_roots(tmp_path: Path):
+    config = load_config("configs/smoke.yaml")
+    manifests = []
+    for name in ("first", "second"):
+        root = tmp_path / name
+        generate_configured_dataset(config, kinds=("piecewise",), root=root)
+        manifests.append((root / "results" / "smoke" / "data" / "manifest.json").read_bytes())
+
+    assert manifests[0] == manifests[1]
