@@ -1,131 +1,153 @@
 # GWF Image Super-Resolution
 
-这是一个基于老师给出的 GWF 方法论构建的图像超分辨率实验项目。第一阶段已完成项目骨架和配置体系，第二阶段已完成合成灰度图像与固定 ×2 退化流程。
-
-## 当前进度
-
-- [x] 建立 `gwf_sr` 核心包；
-- [x] 建立 `scripts`、`tests`、`configs`、`data`、`results` 目录；
-- [x] 定义统一配置模块；
-- [x] 提供完整实验配置 `configs/default.yaml`；
-- [x] 提供快速冒烟配置 `configs/smoke.yaml`；
-- [x] 添加依赖清单 `requirements.txt`；
-- [x] 实现图像数据和固定 ×2 退化；
-- [ ] 实现熵、KL 和 Hilbert 距离；
-- [ ] 实现曲率约束求解器；
-- [ ] 实现图像评价和实验脚本；
-- [ ] 接入真实图像数据集和神经 SR 模型。
+基于 GWF（Geodesic Weighted Flow）方法论的图像超分辨率验证程序。项目实现了从概率分布几何、图曲率约束到连续梯度流求解器的完整方法论验证链路。
 
 ## 项目结构
 
 ```text
-E:\bishe\
-├─ gwf_sr/
-│  ├─ config.py
-│  ├─ synthetic.py
-│  ├─ degradation.py
-│  └─ data.py
-├─ scripts/
-│  └─ generate_data.py
-├─ tests/
-│  ├─ test_synthetic.py
-│  ├─ test_degradation.py
-│  └─ test_data.py
-├─ configs/
-│  ├─ default.yaml
-│  └─ smoke.yaml
-├─ data/
-└─ results/
+gwf_sr/                          # 核心库
+├─ config.py                     # 配置管理
+├─ synthetic.py                  # 合成灰度图像生成
+├─ degradation.py                # 固定退化（高斯模糊+下采样+Bicubic）
+├─ data.py                       # 数据生成与保存
+├─ geometry.py                   # 概率分布、熵、KL、Hilbert 距离
+├─ graph.py                      # 像素图、稀疏边表、归一化扩散
+├─ energy.py                     # Dirichlet 能量、熵能量、总变差
+├─ curvature.py                  # 熵产生、曲率商、曲率函数
+├─ solver.py                     # 超分求解器（Euler/Strang/EM）
+├─ metrics.py                    # PSNR、SSIM、LPIPS、高频指标
+├─ visualization.py              # 收敛曲线、对比图、JSON/CSV 保存
+└─ design/                       # 设计契约文档
+
+scripts/                         # 实验脚本
+├─ generate_data.py              # 合成数据生成
+├─ run_demo.py                   # 端到端演示
+├─ run_ablation.py               # λ 消融实验
+└─ run_stability.py              # 稳定性实验
+
+tests/                           # 单元测试（201 个）
+configs/                         # 实验配置
 ```
 
 ## 环境准备
 
-安装当前阶段所需的最小依赖：
-
 ```powershell
-python -m pip install -r requirements-stage2.txt
+python -m pip install torch numpy Pillow matplotlib PyYAML pytest
 ```
 
-完整实验依赖仍可使用：
+注意：如果 Anaconda 的 PyTorch DLL 损坏，使用系统 Python 或虚拟环境。
+
+## 快速开始
+
+### 1. 运行全部测试
 
 ```powershell
-python -m pip install -r requirements.txt
+python -m pytest -q
 ```
 
-当前机器的 Python 为 3.14.6，已经安装 CPU 版 PyTorch；如果需要使用 Arc B390 核显，应另行安装并验证 PyTorch XPU 版本。
-
-## 配置说明
-
-配置统一使用 YAML 文件，参数由 `gwf_sr.config.GWFConfig` 校验。当前支持：
-
-| 参数 | 含义 |
-|---|---|
-| `scale` | 超分辨率倍率，首轮固定为 2 |
-| `seed` | 随机种子 |
-| `image_size` | 合成 HR 图像边长，必须能被 `scale` 整除 |
-| `sigma` | 高斯退化核标准差 |
-| `noise_std` | 退化噪声标准差 |
-| `iterations` | 求解器迭代次数 |
-| `dt` | 连续梯度流的离散步长 |
-| `lambda_values` | 曲率约束强度消融列表 |
-| `edge_weight_mode` | 图边权模式，当前支持 `uniform` |
-| `epsilon` | 分布严格正化的小常数 |
-| `output_dir` | 结果根目录 |
-| `device` | `auto`、`cpu`、`cuda` 或 `mps` |
-
-## 运行入口
-
-生成配置中的合成数据集：
+### 2. 端到端超分演示
 
 ```powershell
-python scripts\generate_data.py --config configs\smoke.yaml
+python scripts/run_demo.py --config configs/smoke.yaml
 ```
 
-生成结果包含：
+生成 4 种合成图像，运行 Baseline（λ=0）和 GWF-C（λ>0），输出对比图、收敛曲线和指标表。
 
-- `*_hr.png`：高分辨率参考图像；
-- `*_lr.png`：固定高斯模糊和 ×2 下采样后的低分辨率图像；
-- `*_bicubic.png`：LR 图像的 Bicubic 上采样初始化；
-- `manifest.json`：数据集和退化参数清单。
-
-验证阶段二：
+### 3. λ 消融实验
 
 ```powershell
-python -m pytest tests
+python scripts/run_ablation.py --config configs/smoke.yaml
 ```
 
-当前数据生成使用四种内置灰度图：
+扫描 λ=0, 0.1, 1, 5, 10，输出每个 λ 的 PSNR/SSIM/能量/曲率。
 
-- `piecewise`：分块常数图；
-- `edges`：直线边缘图；
-- `texture`：周期纹理图；
-- `smooth`：平滑低频图。
+### 4. 稳定性实验
 
-## 结果目录约定
+```powershell
+python scripts/run_stability.py --config configs/smoke.yaml
+```
 
-每次运行使用独立目录：
+用多种初始化运行，记录 Hilbert 距离收缩曲线。
+
+### 5. 生成合成数据
+
+```powershell
+python scripts/generate_data.py --config configs/smoke.yaml
+```
+
+## 配置参数
+
+| 参数 | 含义 | 默认值 |
+|---|---|---|
+| `scale` | 超分倍率 | 2 |
+| `seed` | 随机种子 | 42 |
+| `image_size` | 图像边长 | 128 |
+| `sigma` | 高斯模糊标准差 | 1.0 |
+| `noise_std` | 噪声标准差 | 0.0 |
+| `iterations` | 迭代次数 | 300 |
+| `dt` | 时间步长 | 0.05 |
+| `lambda_values` | λ 消融列表 | [0, 0.1, 1, 5, 10] |
+| `epsilon` | 分布正则化常数 | 1e-8 |
+| `device` | 运行设备 | auto |
+
+## 方法论到代码映射
+
+| GWF 论文概念 | 代码模块 | 具体接口 |
+|---|---|---|
+| 概率单纯形 | `geometry.py` | `distribution_from_image` |
+| 熵 H(ρ) | `geometry.py` | `entropy` |
+| KL 散度 | `geometry.py` | `kl_divergence` |
+| Hilbert 射影距离 | `geometry.py` | `hilbert_distance` |
+| 图结构 G=(V,E,w) | `graph.py` | `build_pixel_graph` |
+| 归一化扩散算子 | `graph.py` | `normalized_adjacency_action` |
+| Dirichlet 能量 | `energy.py` | `dirichlet_energy` |
+| 熵能量 H_λ | `energy.py` | `entropy_energy` |
+| 总变差 TV | `energy.py` | `total_variation` |
+| 熵产生 I(ρ) | `curvature.py` | `entropy_production` |
+| 曲率商 K_λ | `curvature.py` | `curvature_quotient` |
+| 曲率函数 a(R) | `curvature.py` | `curvature_acceleration` |
+| 数据保真梯度流 | `solver.py` | `data_fidelity_gradient` |
+| 曲率正则梯度流 | `solver.py` | `regularization_gradient` |
+| Euler 离散化 | `solver.py` | `SuperResolutionSolver(integrator="euler")` |
+| Strang 分裂 | `solver.py` | `SuperResolutionSolver(integrator="strang")` |
+| 图像投影 P_[0,1] | `solver.py` | `project_image` |
+| PSNR | `metrics.py` | `psnr` |
+| SSIM | `metrics.py` | `ssim` |
+| LPIPS | `metrics.py` | `lpips_distance` |
+
+## 数学定义
+
+### 退化模型
+
+y = D↓(Bσ(x))
+
+### 数据保真梯度流
+
+dx/dt = -A*(A(x) - y)
+
+### Strang 分裂
+
+每步执行：曲率半步 → 数据全步 → 曲率半步，每步投影到 [0,1]。
+
+## 输出结构
 
 ```text
-results/<config_name>/
-├─ data/
-├─ results/
-├─ checkpoints/
-└─ logs/
+results/<config>/
+├─ data/                          # HR/LR/Bicubic 图像 + manifest
+└─ metrics/<sample>/<method>/     # 指标、对比图、收敛曲线、轨迹
 ```
 
-## 方法论对应
+## 测试
 
-本项目将按照以下链路逐步实现：
+```powershell
+python -m pytest -q
+```
 
-1. 固定高斯模糊和 ×2 下采样；
-2. Bicubic 初始化；
-3. 熵梯度流基线；
-4. 曲率约束 GWF-C；
-5. λ 消融；
-6. 步长收敛验证；
-7. 不同初始化和扰动的稳定性验证；
-8. 标准 SR 数据集扩展。
+201 个测试覆盖配置、合成图像、退化、几何、图、能量、曲率、求解器、指标、可视化。
 
 ## 已知限制
 
-第二阶段只完成合成数据、固定退化、Bicubic 初始化和数据保存，不包含 GWF 求解器、图像指标或实验图表。
+1. CPU 版 PyTorch，GPU 加速待配置；
+2. 首轮使用合成灰度图像，真实数据集扩展进行中；
+3. LPIPS 为可选依赖，未安装时返回 None；
+4. λ 需根据图像尺寸和迭代次数调整（小图建议 λ≤0.1）。
