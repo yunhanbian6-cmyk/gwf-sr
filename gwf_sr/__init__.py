@@ -28,6 +28,20 @@ from .graph import (
     graph_total_weight,
     normalized_adjacency_action,
 )
+from .metrics import (
+    ImageMetrics,
+    compare_images,
+    compute_image_metrics,
+    edge_preservation_index,
+    edge_preservation_ratio,
+    gradient_magnitude,
+    high_frequency_energy,
+    high_frequency_energy_ratio,
+    lpips_available,
+    lpips_distance,
+    psnr,
+    ssim,
+)
 from .solver import (
     SolverResult,
     SuperResolutionSolver,
@@ -37,6 +51,16 @@ from .solver import (
     degradation_forward,
     project_image,
     regularization_gradient,
+)
+from .visualization import (
+    EvaluationBundle,
+    plot_convergence_curves,
+    plot_method_comparison,
+    save_evaluation_bundle,
+    save_image_comparison,
+    save_metrics_csv,
+    save_metrics_json,
+    tensor_to_uint8,
 )
 
 __all__ = [
@@ -75,5 +99,25 @@ __all__ = [
     "SolverResult",
     "degradation_forward",
     "degradation_adjoint",
+    "psnr",
+    "ssim",
+    "lpips_distance",
+    "lpips_available",
+    "high_frequency_energy",
+    "high_frequency_energy_ratio",
+    "edge_preservation_index",
+    "edge_preservation_ratio",
+    "gradient_magnitude",
+    "compare_images",
+    "compute_image_metrics",
+    "ImageMetrics",
+    "plot_convergence_curves",
+    "plot_method_comparison",
+    "save_metrics_json",
+    "save_metrics_csv",
+    "save_image_comparison",
+    "save_evaluation_bundle",
+    "EvaluationBundle",
+    "tensor_to_uint8",
 ]
 __version__ = "0.1.0"
